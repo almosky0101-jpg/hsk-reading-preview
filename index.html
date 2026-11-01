@@ -394,8 +394,12 @@ function renderPractice(){
  for(let sec=1;sec<=8;sec++){
   html+=`<section class="panel source-text"><h3>第${sec}部分：${sectionNames[sec]}</h3>`;
   if(sec===1){html+=renderCloze(subs)+'</section>';continue}
-  // Keep every original prompt and reading passage available, including the cloze context.
-  html+=`<details ${[1,7].includes(sec)?'open':''}><summary>原稿题面与阅读材料</summary>${sourceLines(unit.practiceSections[sec])}</details>`;
+  if(sec===7){
+   const lines=unit.practiceSections[sec],question=objective.find(q=>q.section===sec);
+   const end=lines.findIndex(line=>line.replace(/^\s*(?:\d+[.．、]\s*|○\s*)/,'').trim()===question.title.trim());
+   const start=lines.findIndex(line=>line.startsWith('补充阅读'));
+   html+=`<div class="practice-reading" data-learning-content lang="zh-CN">${sourceLines(lines.slice(Math.max(0,start),end<0?lines.length:end))}</div>`;
+  }
   if([1,2,3,4,7].includes(sec)){
    for(const q of objective.filter(q=>q.section===sec)){
     const old=subs.find(s=>s.qid===q.id);
